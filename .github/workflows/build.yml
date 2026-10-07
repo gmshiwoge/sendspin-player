@@ -331,8 +331,10 @@ jobs:
   # ---------------------------------------------------------------------------
   build-macos:
     name: Build macOS (osx-arm64)
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: test
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.0.1.app/Contents/Developer
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -341,6 +343,9 @@ jobs:
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Check Xcode
+        run: xcodebuild -version
 
       - name: Install the macOS workload
         run: dotnet workload install macos
@@ -351,6 +356,7 @@ jobs:
           --configuration Release
           --framework net10.0-macos
           --runtime osx-arm64
+          -p:SendspinMacOSPlatformVersion=26.0
           --output ./publish/osx-arm64
 
       # The macOS SDK's publish artifact is the .pkg installer, so CreatePackage=false
